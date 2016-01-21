@@ -31,8 +31,11 @@ public class Sensor_data {
     public SensorManager mSensorManager;
     public DecimalFormat round;
 
-    private float orientation[] =null;
+    private float magnetic[] =null;
     private float acceleration[] = null;
+
+    private float rotation[]= new float[9];
+    private float orientation[] = new float[3];
 
     private static LowpassFilter lowpass=new LowpassFilter();
 
@@ -65,11 +68,18 @@ public class Sensor_data {
             accel_y.setText(""+round.format(event.values[1]));
             accel_z.setText(""+round.format(event.values[2]));
 
-            acceleration=lowpass.lowPass(event.values,0.05f);
-
-            filter_x.setText(""+round.format(acceleration[0]));
+          //  acceleration=lowpass.lowPass(event.values,0.05f);
+            acceleration=event.values.clone();
+            if(magnetic != null){
+                mSensorManager.getRotationMatrix(rotation,null,acceleration,magnetic);
+                mSensorManager.getOrientation(rotation,orientation);
+                filter_x.setText(""+round.format(orientation[0]));
+                filter_y.setText(""+round.format(orientation[1]));
+                filter_z.setText("" + round.format(orientation[2]));
+            }
+         /*   filter_x.setText(""+round.format(acceleration[0]));
             filter_y.setText(""+round.format(acceleration[1]));
-            filter_z.setText(""+round.format(acceleration[2]));
+            filter_z.setText("" + round.format(acceleration[2]));*/
            // mSensorManager.getRotationMatrix(newMat,null,acceleration,orientation);
         }
 
@@ -97,8 +107,18 @@ public class Sensor_data {
         @Override
         public void onSensorChanged(SensorEvent event) {
             mag_x.setText(""+round.format(event.values[0]));
-            mag_y.setText(""+round.format(event.values[1]));
-            mag_z.setText(""+round.format(event.values[2]));
+            mag_y.setText("" + round.format(event.values[1]));
+            mag_z.setText("" + round.format(event.values[2]));
+
+            magnetic=event.values.clone();
+            if(acceleration != null){
+                mSensorManager.getRotationMatrix(rotation,null,acceleration,magnetic);
+                mSensorManager.getOrientation(rotation,orientation);
+                filter_x.setText(""+round.format(orientation[0]));
+                filter_y.setText(""+round.format(orientation[1]));
+                filter_z.setText("" + round.format(orientation[2]));
+            }
+
         }
 
         @Override
